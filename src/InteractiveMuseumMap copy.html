@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=yes"> 
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<style>
+body { margin: 10; padding: 10; }
+#map { position: absolute; top: 30; bottom: 30; width: 10%; }
+</style>
+</head>
+<body>
+<style>
+
+
+/* Create the css formatting for the Notes/Sources */
+
+#sources {
+            position: absolute;
+            z-index: 1;
+            left:10px;
+            bottom: 35px; /* We want it to be 20 pixels above the bottom of the window */
+            width: 40%; /* we want the width to take up 40% of the window (up to 350px) */
+            max-width: 350px; /* But we don't want the width to be larger than 350 px */
+            color:#8d8d8d;
+            font-family: 'Roboto', sans-serif;
+            padding:10px;
+            padding-top: 0;
+            padding-bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9); 
+            border-radius:5px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+/* Create css formatting for the header/description of the map */
+
+#info {
+            background-color: rgba(255, 255, 255, 0.9); 
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+            max-width: 350px;
+            width: 40%;
+            font-family: 'Roboto', sans-serif;
+            padding:10px;
+            border-radius:5px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+/* Set the formatting for the different font types */
+    .p1 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700; /* Bold */
+            font-size: 18pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top:10px;
+            margin-bottom:5px;
+        }
+
+    .p2 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300; /* Light */
+            font-size: 12pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom:10px;
+            margin-top:10px;
+        }
+
+      .p3 {
+        font-family: 'Roboto', sans-serif;
+            font-weight: 400; /* Regular */
+            font-size: 10pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top:10px;
+        }
+
+        .p4 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            font-size: 10pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom:10px;
+            margin-top:10px;
+        }
+
+        .p5 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            font-size: 12pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top:10px;
+            margin-bottom:5px;
+        }
+
+        .p6 {
+        font-family: 'Roboto', sans-serif;
+            font-weight: 400; /* Regular */
+            font-size: 12pt;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top:10px;
+        }
+
+        
+/* Set the CSS formatting for the menu (list of buttons) */
+    #menu {
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        right: 10px;
+        width: 120px;
+
+        font-family: 'Roboto', sans-serif;
+    }
+/* Formatting for each individual museum */
+/* This is the default formatting for each button */
+    #menu a {
+        font-size: 13px;
+        background-color: rgba(245, 245, 245, 0.25);
+        color: black;
+        display: block;
+        margin: 0;
+        margin-bottom: 3px;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-radius:5px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            font-size: 10pt;
+    }
+/* Set the "active" formatting for each button (this is what the buttons will look like when they're turned on) */
+    #menu a.cuny {
+      background-color: #0033a1;
+      color: #ffffff;
+    }
+
+    #menu a.cuny:hover { /* this is what the cuny button will look like when you hover over it while it's turned on */
+      background-color: rgba(0,51,161,0.5);
+      color: #ffffff;
+    }
+
+    #menu a.nyu {
+      background-color: #8900e1;
+      color: #ffffff;
+    }
+
+    #menu a.nyu:hover {
+      background-color: rgba(137,0,225,0.25);
+      color: #ffffff;
+    }
+
+    #menu a.removed {
+      background-color: #888888;
+    }
+
+    #menu a.removed:hover {
+      background-color: rgba(136, 136, 136, 0.25);
+    }
+
+    #menu a.current {
+      background-color: #FFD400;
+    }
+
+    #menu a.current:hover {
+      background-color: rgba(255, 212, 0, 0.25);
+    }
+
+    #menu a.nypl {
+      background-color: #f56e6e;
+    }
+
+    #menu a.nypl:hover {
+      background-color: rgba(245, 110, 110, 0.25);
+    }
+
+
+
+    #menu a:last-child{
+        border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+/* This is what all of the buttons will look like if you over over them when they're turned off */
+    #menu a:hover {
+        background-color: rgba(203, 203, 203, 0.5);
+        color: #404040;
+    }
+
+/* I DIDN'T USE THESE */
+    #menu a.active {
+        background-color: rgba(255, 255, 255, 90%);
+        color: black;
+    }
+
+    #menu a.active:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+</style>
+
+<!-- Now, we want to place our items -->
+<!-- Divs in HTML are basically like "things" to add to the page, and then they can be customized using the classes you created earlier with CSS -->
+<div id="map_container">
+<nav id="menu"></nav>
+<div id="map"></div>
+<div id="info">
+    <p class="p1">Arts passes in New York City</p>
+    <p class="p2">Columbia, the City University of New York, New York University, and Culture Pass (through the New York, Brooklyn, and Queens Public Libraries) offer free admission to various museums and cultural institutions in the city.</p>
+    <p class="p6">Click on the buttons on the right to show/hide different cultural institutions pass lists.</p>
+    <p class="p6">Click on a point to view details.</p>
+</div>
+<div id="sources">
+  <p class="p3">Sources: Spectator reporting, the Columbia Arts Initiative website, the CUNY Arts website, the NYU Free Museum Access website, the Culture Pass website, Google Maps<br>Graphic by Molly Durawa</p>
+</div>
+</div>
+
+<!-- Now for the javascript -->
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoibW9sbHlkdXJhd2EiLCJhIjoiY2xtbTZwOXN0MGYxNzJrbjV1dzEzdjBxMSJ9.2uhynAHwkRnPp99Xooe2-w'; // This is the acess token for a blank monochrome map style I created in mapbox studio
+    const map = new mapboxgl.Map({
+        container: 'map',
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'mapbox://styles/mollydurawa/clobu733m00r701p66las33m6', // this is the style for that blank map style
+        zoom: 10, // set default zoom to 10
+        center: [-73.975188, 40.724906], // set the default center of the map
+        maxZoom:16 // I set maximum zoom to 16 because there are some points with the same lat/long that were for some reason showing up separately when you zoomed in really close, so I wanted to make it so you couldn't do that
+    });
+
+// now, let's load the layers.
+// We'll be taking these from tilesets we created in mapbox studio 
+
+   // Wait until the map has finished loading.
+map.on('load', () => {
+// Add a custom vector tileset source. This tileset contains
+// point features representing museums. Each feature contains
+// three properties. For example:
+// {
+//     alt_name: "Museo Arqueologico",
+//     name: "Museo Inka",
+//     tourism: "museum"
+
+
+// CURRENT MUSEUMS
+map.addSource('current_data', { // give it whatever name you want
+type: 'vector',
+url: 'mapbox://mollydurawa.clnwgt1uh5e282bno855oed8v-1tw98' // the url should be 'mapbox://[tileset ID]'
+});
+
+map.addLayer({
+    "id": "Columbia Arts Initiative (current)", // give this whatever name you want
+    "type": "circle", // points will show up as circles on map
+    'layout': {
+    // Make the layer visible by default.
+    'visibility': 'visible'
+    },       
+    "paint": {
+      "circle-color": "#FFD400" // this'll be the color of the points on the map
+    },
+    "source": "current_data", // name of source you set earlier
+    "source-layer": "current_musuems_11_8_new_2", // name of tileset
+    "icon-allow-overlap": true
+});
+
+
+
+// CUNY MUSEUMS
+map.addSource('cuny_data', {
+type: 'vector',
+url: 'mapbox://mollydurawa.clo6mhk370c662inztyl53rbe-30em2'
+});
+
+map.addLayer({
+    "id": "CUNY Arts",
+    "type": "circle",
+    "paint": {
+      "circle-color": "#0033a1"
+    },
+    "layout": {
+        // Make the layer hidden by default (we only want to show current museums when the map first loads)
+'visibility': 'none'
+    },
+    "source": "cuny_data",
+    "source-layer": "cuny_musuems_11_8_new",
+    "icon-allow-overlap": true
+});
+ 
+ 
+
+// NYU MUSEUMS
+map.addSource('nyu_data', {
+type: 'vector',
+url: 'mapbox://mollydurawa.clo6mi8f90mb12cpg3cjgq3k2-7fnkb'
+});
+
+map.addLayer({
+    "id": "NYU Museum Gateway",
+    "type": "circle",
+    "paint": {
+      "circle-color": "#8900e1"
+    },
+    "layout": {
+'visibility': 'none'
+    },
+    "source": "nyu_data",
+    "source-layer": "nyu_musuems",
+    "icon-allow-overlap": true
+});
+
+
+
+// NYPL MUSEUMS
+map.addSource('nypl_data', {
+type: 'vector',
+url: 'mapbox://mollydurawa.clo6mhwty0c882dmswl8tmxgu-0df4f'
+});
+
+map.addLayer({
+    "id": "NYPL Culture Pass",
+    "type": "circle",
+    "paint": {
+        "circle-color":"#f56e6e"
+    },
+    "layout": {'visibility': 'none'},
+    "source": "nypl_data",
+    "source-layer": "nypl_musuems_11_8_new",
+    "icon-allow-overlap": true
+});
+
+
+// REMOVED MUSEUMS
+map.addSource('removed_data', {
+type: 'vector',
+url: 'mapbox://mollydurawa.clo6miv2u2yds2ansqf2id94u-8ir00'
+});
+
+map.addLayer({
+    "id": "Columbia Arts Initiative (removed)",
+    "type": "circle",
+    "paint": {
+      "circle-color": "#888888"
+    },
+    "layout": {'visibility': 'none'},
+    "source": "removed_data",
+    "source-layer": "removed_musuems_11_8",
+    "icon-allow-overlap": true
+    
+});
+
+
+});
+
+// Now, let's add the ability to toggle the layers on/off
+
+// After the last frame rendered before the map enters an "idle" state.
+map.on('idle', () => {
+// If these two layers were not added to the map, abort
+if (!map.getLayer('CUNY Arts') || !map.getLayer('Columbia Arts Initiative (current)') || !map.getLayer('NYU Museum Gateway') || !map.getLayer('NYPL Culture Pass') || !map.getLayer('Columbia Arts Initiative (removed)')) {
+return;
+}
+
+
+ 
+// Enumerate ids of the layers.
+const toggleableLayerIds = ['Columbia Arts Initiative (current)', 'Columbia Arts Initiative (removed)', 'CUNY Arts',  'NYU Museum Gateway', 'NYPL Culture Pass'];
+ 
+// Set up the corresponding toggle button for each layer.
+for (const id of toggleableLayerIds) {
+// Skip layers that already have a button set up.
+if (document.getElementById(id)) {
+continue;
+}
+ 
+// Create a link.
+const link = document.createElement('a');
+link.id = id;
+link.href = '#';
+link.textContent = id;
+
+// We want to set the button for the Current Arts Initiative museums to its active state, so we're going to set its class to "current" by default
+if (link.id === "Columbia Arts Initiative (current)"){ 
+  link.className = 'current';
+}
+
+
+ 
+// Show or hide layer when the toggle is clicked.
+link.onclick = function (e) {
+const clickedLayer = this.textContent;
+e.preventDefault();
+e.stopPropagation();
+ 
+const visibility = map.getLayoutProperty(
+clickedLayer,
+'visibility'
+);
+ 
+// Toggle layer visibility by changing the layout object's visibility property.
+
+// if the layers are visible and you click on its button, hide the layer
+if (visibility === 'visible') {
+map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+this.className = '';
+
+// otherwise (if the layers are invisible), the layer should become visisble when you click on its button
+// and the button you click on should be set to its active state
+} else {
+this.className = 'active';
+map.setLayoutProperty(
+clickedLayer,
+'visibility',
+'visible'
+);
+if (link.id === "CUNY Arts"){
+  link.className = 'cuny';
+}
+if (link.id === "NYU Museum Gateway"){
+  link.className = 'nyu';
+}
+
+if (link.id === "Columbia Arts Initiative (current)"){
+  link.className = 'current';
+}
+
+if (link.id === "NYPL Culture Pass"){
+  link.className = 'nypl';
+}
+
+if (link.id === "Columbia Arts Initiative (removed)"){
+  link.className = 'removed';
+}
+}
+};
+ 
+const layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+
+
+});
+
+// Now, let's work on the popups 
+
+// CURRENT MUSEUMS
+map.on('click', (event) => {
+  // If the user clicked on one of your markers, get its information.
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['Columbia Arts Initiative (current)'] // replace with your layer name
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+  
+
+/* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(feature.geometry.coordinates)
+  .setHTML(
+    `<p class="p5">${feature.properties.name}</p><p class="p4">${feature.properties.description}</p>`
+  )
+  .addTo(map);
+
+
+});
+
+
+
+// CUNY MUSEUMS
+map.on('click', (event) => {
+  // If the user clicked on one of your markers, get its information.
+  const features1 = map.queryRenderedFeatures(event.point, {
+    layers: ['CUNY Arts'] // replace with your layer name
+  });
+  if (!features1.length) {
+    return;
+  }
+  const feature1 = features1[0];
+  
+
+/* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  const popup1 = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(feature1.geometry.coordinates)
+  .setHTML(
+    `<p class="p5">${feature1.properties.name}</p><p class="p4">${feature1.properties.description}</p>`
+  )
+  .addTo(map);
+
+});
+
+// NYPL MUSEUMS
+map.on('click', (event) => {
+  // If the user clicked on one of your markers, get its information.
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['NYPL Culture Pass'] // replace with your layer name
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+  
+
+/* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(feature.geometry.coordinates)
+  .setHTML(
+    `<p class="p5">${feature.properties.name}</p><p class="p4">${feature.properties.description}</p>`
+  )
+  .addTo(map);
+
+
+});
+
+// NYU MUSEUMS
+map.on('click', (event) => {
+  // If the user clicked on one of your markers, get its information.
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['NYU Museum Gateway'] // replace with your layer name
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+  
+
+/* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(feature.geometry.coordinates)
+  .setHTML(
+    `<p class="p5">${feature.properties.name}</p><p class="p4">${feature.properties.description}</p>`
+  )
+  .addTo(map);
+
+
+});
+
+// REMOVED MUSEUMS
+map.on('click', (event) => {
+  // If the user clicked on one of your markers, get its information.
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['Columbia Arts Initiative (removed)'] // replace with your layer name
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+  
+
+/* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(feature.geometry.coordinates)
+  .setHTML(
+    `<p class="p5">${feature.properties.name}</p><p class="p4">${feature.properties.description}</p>`
+  )
+  .addTo(map);
+
+
+});
+
+// Change the cursor to a pointer when the mouse is over the places layer.
+map.on('mouseenter', ['NYU Museum Gateway', 'Columbia Arts Initiative (removed)', 'NYPL Culture Pass', 'Columbia Arts Initiative (removed)', 'CUNY Arts'], () => {
+map.getCanvas().style.cursor = 'pointer';
+});
+ 
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', ['NYU Museum Gateway','Columbia Arts Initiative (removed)', 'NYPL Culture Pass', 'Columbia Arts Initiative (current)', 'CUNY Arts'], () => {
+map.getCanvas().style.cursor = '';
+});
+
+</script>
+ 
+</body>
+</html>
