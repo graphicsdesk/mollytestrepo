@@ -129,10 +129,16 @@
 
         
 /* Set the CSS formatting for the menu (list of buttons) */
+
+    #menu_container {
+      position: relative;
+
+    }
     #menu {
         position: absolute;
         z-index: 1;
-        top: 26%;
+     
+
         left: 1%;
         width: 90px;
 
@@ -234,7 +240,9 @@
   <p class="p2">There are 19 polling sites that will be open to voters in Community Board 9 on Nov. 5. Three sites in CB9 will be open for early voting from Oct 26. to Nov. 3.</p>
   <p class="p6">Click on the buttons on the right to show/hide sites that will be open for early vs. regular voting.</p>
   <p class="p6">Click on a point to view details.</p>
+  <div id="menu_container">
 <nav id="menu"></nav>
+</div>
 <div id="map"></div>
 <div id="sources">
   <p class="p3">Sources: Vote Early NY, NYC Board of Elections<br>Graphic by Name</p>
